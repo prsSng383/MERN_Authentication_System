@@ -36,14 +36,12 @@ export const register = async (req , res) => {
    const token = jwt.sign({id: uesrToBePushed._id},process.env.JWT_SECRET,{expiresIn: '7d'}) ;
     
    // or yeah token ham frontend ko cookie ke through denege.
-
-   res.cookie('token', token , {
-      httpOnly : true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000
-   })
-  
+    res.cookie('token' , token , {
+         httpOnly : true,
+         secure: true,
+         sameSite:"none",
+         maxAge: 7 * 24 * 60 * 60 * 1000
+      })
 
    // Sending successfull registered email.
     // these options are needed to be field in the nodemailer's transposter.sendMail(); 
