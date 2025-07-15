@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT || 4000 ;
 connectDB();
 
-const allowedOrigins = ['https://mern-authentication-system-bknd.onrender.com']
+const allowedOrigins = ['https://mern-authentication-system-frontend.onrender.com']
 
 app.use(express.json());
 app.use(cookieParser());
