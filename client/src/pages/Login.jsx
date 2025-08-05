@@ -15,22 +15,25 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
- const onSubmitHandler = async (e) => {
+const onSubmitHandler = async (e) => {
   e.preventDefault();
   setLoading(true);
 
   let wakeToastId = null;
+  let toastShown = false;
 
-  // Show toast if the server takes more than 3 seconds to respond
   const timeout = setTimeout(() => {
-    if (loading) {
-      wakeToastId = toast.info("Waking up server, please wait...", { autoClose: 2000 });
-    }
-  }, 2000);
+    wakeToastId = toast.info("Waking up server, please wait...", {
+      autoClose: false,
+      closeOnClick: true,
+    });
+    toastShown = true;
+  }, 3000);
 
   try {
     axios.defaults.withCredentials = true;
 
+    // Login or Signup logic
     if (state === "Sign Up") {
       const { data } = await axios.post(backendUrl + "/api/auth/register", { name, email, password });
       if (data.success) {
@@ -52,13 +55,14 @@ const Login = () => {
       }
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.message || "Something went wrong");
   } finally {
     clearTimeout(timeout);
-    if (wakeToastId) toast.dismiss(wakeToastId);
+    if (toastShown && wakeToastId) toast.dismiss(wakeToastId);
     setLoading(false);
   }
 };
+
 
 
   return (
