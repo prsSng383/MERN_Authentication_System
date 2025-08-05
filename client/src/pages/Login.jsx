@@ -30,7 +30,7 @@ const Login = () => {
       closeOnClick: true,
     });
     toastShown = true;
-  }, 3000);
+  }, 1000);
 
   try {
     axios.defaults.withCredentials = true;
