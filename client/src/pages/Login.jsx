@@ -50,6 +50,8 @@ const Login = () => {
 
     try {
       axios.defaults.withCredentials = true;
+      // Add this in /api/auth/login or /register
+await new Promise(resolve => setTimeout(resolve, 45000)); // simulate 45s delay
 
 
 
