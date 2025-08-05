@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { assets } from '../assets/assets';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
@@ -13,41 +13,53 @@ const Login = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // loader state
+  const [loading, setLoading] = useState(false);
 
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+ const onSubmitHandler = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      axios.defaults.withCredentials = true;
+  let wakeToastId = null;
 
-      if (state === "Sign Up") {
-        const { data } = await axios.post(backendUrl + "/api/auth/register", { name, email, password });
-        if (data.success) {
-          setIsLoggedin(true);
-          getUserData();
-          setState("Login");
-          toast.success(data.message);
-        } else {
-          toast.error(data.message);
-        }
-      } else {
-        const { data } = await axios.post(backendUrl + "/api/auth/login", { email, password });
-        if (data.success) {
-          setIsLoggedin(true);
-          getUserData();
-          navigate("/");
-        } else {
-          toast.error(data.message);
-        }
-      }
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
+  // Show toast if the server takes more than 3 seconds to respond
+  const timeout = setTimeout(() => {
+    if (loading) {
+      wakeToastId = toast.info("Waking up server, please wait...", { autoClose: 2000 });
     }
-  };
+  }, 2000);
+
+  try {
+    axios.defaults.withCredentials = true;
+
+    if (state === "Sign Up") {
+      const { data } = await axios.post(backendUrl + "/api/auth/register", { name, email, password });
+      if (data.success) {
+        setIsLoggedin(true);
+        getUserData();
+        setState("Login");
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } else {
+      const { data } = await axios.post(backendUrl + "/api/auth/login", { email, password });
+      if (data.success) {
+        setIsLoggedin(true);
+        getUserData();
+        navigate("/");
+      } else {
+        toast.error(data.message);
+      }
+    }
+  } catch (error) {
+    toast.error(error.message);
+  } finally {
+    clearTimeout(timeout);
+    if (wakeToastId) toast.dismiss(wakeToastId);
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className='bg-red-100 flex items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-br from-blue-200 to-purple-400'>
@@ -71,7 +83,7 @@ const Login = () => {
             <div className='flex items-center gap-3 mb-3 px-5 py-2.5 rounded-full bg-[#333A5C]'>
               <img src={assets.person_icon} alt="" />
               <input
-                onChange={(eve) => setName(eve.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 value={name}
                 className='bg-transparent outline-none'
                 type="text"
@@ -84,7 +96,7 @@ const Login = () => {
           <div className='flex items-center gap-3 mb-3 px-5 py-2.5 rounded-full bg-[#333A5C]'>
             <img src={assets.mail_icon} alt="" />
             <input
-              onChange={(eve) => setEmail(eve.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               value={email}
               className='bg-transparent outline-none'
               type="email"
@@ -96,7 +108,7 @@ const Login = () => {
           <div className='flex items-center gap-3 mb-3 px-5 py-2.5 rounded-full bg-[#333A5C]'>
             <img src={assets.lock_icon} alt="" />
             <input
-              onChange={(eve) => setPassword(eve.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               value={password}
               className='bg-transparent outline-none'
               type="password"
